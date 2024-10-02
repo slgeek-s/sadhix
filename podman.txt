@@ -1,0 +1,47 @@
+14. Container
+--> Create a container name logserver using the rsyslog image from the registry.   >> DONE 
+--> Ensure the container is started using the user student. Password for user student is redhat   >> DONE 
+--> Also ensure that container is running on the node1 even after system reboot
+				AND
+Q15. Persistence volume.
+-->Using the existing container mount the host directory /home/student/container_journal to the
+container under /var/log/journal.
+
+# podman start myregistry    >> no need to perform in exam              
+
+# vi /etc/systemd/journald.conf
+insert 
+uncomment # storage 
+storage=persistent
+:wq!
+# systemctl restart systemd-journald				
+
+# su - student
+# mkdir 	/home/student/container_journal	
+# cp -rv   /var/log/journal/  /home/student/container_journal/  
+			
+# podman  login  localhost:5000  
+username : admin
+passwd : admin
+# podman  search rsyslog
+# podman pull myrsyslog
+# podman images 			
+# podman run -d  --name mylogserver   -v  /home/student/container_journal:/var/log/journal:Z  myrsyslog 
+# cd /home/student/.config/systemd/user/
+# podman generate systemd  --name mylogserver  -n -f 
+# podman stop mylogserver 
+# podman ps
+# loginctl show-user student                 # providing access to student 
+# loginctl enable-linger   student 
+# loginctl show-user student
+# systemctl --user  daemon-reload 
+# export XDG_RUNTIME_DIR=/run/user/$(id -u)   #Failed to connect to bus: No such file or directory
+# systemctl --user  daemon-reload 
+# systemctl --user  enable  --now   container-mylogserver.service 
+# logout
+# reboot
+# su - student 
+# systemctl --user status  container-mylogserver.service 
+# podman ps
+
+			  							   
